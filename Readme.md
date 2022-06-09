@@ -1,11 +1,11 @@
 # vtdecode
 
-This project contains multiple entry points, each serving different purposes.
+This project centers around decoding Vector Tile formats (protobuf) files and converting them to JSON. It uses the same backend for decoding Vertex Tile files, and provides multiple entrypoints for fetching those files.
 
 ## Entrypoints
 
 ### main.py
-Decodes Vertex-Tile Protobuf files into GeoJSON.
+Decodes a Vertex-Tile Protobuf on the computer, and saves it to a JSON file containing GeoJSON.
 
 ```
 usage: main.py [-h] -i INPUT_FILE -o OUTPUT_FILE [-x TILE_X] [-y TILE_Y] [-z TILE_Z] [--json-indent JSON_INDENT] [--layer LAYER]
@@ -25,6 +25,8 @@ optional arguments:
                         JSON file indentation. 0 or negative numbers generate dense JSON file.
   --layer LAYER         Only decode layer with given name. Outputs Pure GeoJSON.
 ```
+
+Example usage: `python main.py --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
 
 ### mapillary.py
 Fetch a bunch of data from Mapillary, convert them to GeoJSON, and put them into a folder.
@@ -79,7 +81,7 @@ The command above will generate file and folder structure as follows, where each
     └── mly_map_feature_traffic_sign-14-2748-6524.json
 ```
 
-Note that the Mapillary URL must resemble `https://tiles.mapillary.com/maps/vtp/****/2/**/{x}/{y}******`.
+Note that the Mapillary URL must resemble `https://tiles.mapillary.com/maps/vtp/****/2/**/{x}/{y}******`. The program will try to parse the string and find object type and tile coordinates.
 
 ## Output Format
 Each layer in the input file will be converted into one `FeatureCollection`, therefore one GeoJSON object. Therefore, the output file will NOT be a pure GeoJSON file (unless you specified the `--layer` option). Instead, it will contain multiple GeoJSON objects indexed by their layer names.
