@@ -31,6 +31,7 @@ requires-python = ">=3.8"
     [project.scripts]
     vtdecode = "vtdecode.main:main"
     vtdecode-mapillary = "vtdecode.mapillary:main"
+    vtdecode-mapbox = "vtdecode.mapbox:main"
 
 [tool.bumpver]
 current_version = "1.1.0"

@@ -8,15 +8,17 @@ This package is available on PyPI.
 pip install vtdecode
 ```
 
+It provides three commands: `vtdecode`, `vtdecode-mapbox` and `vtdecode-mapillary`
+
 ## Entrypoints
 
 ### vtdecode
 Decodes a Vertex-Tile Protobuf on the local machine, and saves it to a JSON file containing GeoJSON.
 
 ```
-usage: main.py [-h] -i INPUT_FILE -o OUTPUT_FILE [-x TILE_X] [-y TILE_Y] [-z TILE_Z] [--json-indent JSON_INDENT] [--layer LAYER]
+usage: main.py [-h] -i INPUT_FILE -o OUTPUT_FILE [-x TILE_X] [-y TILE_Y] [-z TILE_Z] [--json-indent JSON_INDENT] [--layer LAYER] [--split-layers]
 
-Convert Vector Tile Protobuf files to GeoJSON.
+Convert Vector Tile Protobuf files to GeoJSON, and saves it to a *.json file.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -30,6 +32,7 @@ optional arguments:
   --json-indent JSON_INDENT
                         JSON file indentation. 0 or negative numbers generate dense JSON file.
   --layer LAYER         Only decode layer with given name. Outputs Pure GeoJSON.
+  --split-layers        Split layers into separate GeoJSON files. Outputs Pure GeoJSON.
 ```
 
 X, Y, and Zoom levels represent the tile coordinates as specified in https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames.
@@ -41,11 +44,19 @@ When using the --split-layer option, multiple files will be generated (suffixed 
 
 Example usage: `vtdecode --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
 
-### vtdecode-mapillary
-Fetch a bunch of data from Mapillary, convert them to GeoJSON, and put them into a folder.
+### vtdecode-mapillary, vtdecode-mapbox
+Fetch data from Mapillary or Mapbox, convert them to GeoJSON, and put them into a folder.
+
+**Fetching a range of tiles:** If all of `--start-x`, `--start-y`, `--end-x`, `--end-y` is provided, the URL will be treated as a template, replace `{x}` and `{y}`, and fetch all tiles within the specified range. 
+
+When fetching a range of tiles, you must use `--output-dir` to specify an output directory. 
+
+**Fetching a single tile:** If any of`--start-x`, `--start-y`, `--end-x`, `--end-y` is not provided, the URL will be treated as a pure URL and only a single file will be fetched. 
+
+When fetching a single tile, you can either use `--output-dir` to specify a directory or `--output` to specify an output filename. When both is provided, `--output` is preferred.
 
 ```
-usage: mapillary.py [-h] --url URL --start-x START_X --start-y START_Y --end-x END_X --end-y END_Y [--json-indent JSON_INDENT] --output-dir OUTPUT_DIR [--split-layers]
+usage: mapillary.py [-h] --url URL [--start-x START_X] [--start-y START_Y] [--end-x END_X] [--end-y END_Y] [--json-indent JSON_INDENT] [--output-dir OUTPUT_DIR] [--split-layers] [--output OUTPUT]
 
 Fetch multiple tiles from mapillary.com and convert to GeoJSON.
 
@@ -61,44 +72,23 @@ optional arguments:
   --output-dir OUTPUT_DIR
                         Output directory
   --split-layers        Split layers into separate GeoJSON files. Outputs Pure GeoJSON.
+  --output OUTPUT       Output file
 ```
 
-Example usage: `vtdecode-mapillary --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
+Example usage: 
 
-The command above will generate file and folder structure as follows, where each `json` file is a dictionary of GeoJSON files as shown in the [Output Format] section below.
-```
-└── traffic-signs
-    ├── mly_map_feature_traffic_sign-14-2744-6520.json
-    ├── mly_map_feature_traffic_sign-14-2744-6521.json
-    ├── mly_map_feature_traffic_sign-14-2744-6522.json
-    ├── mly_map_feature_traffic_sign-14-2744-6523.json
-    ├── mly_map_feature_traffic_sign-14-2744-6524.json
-    ├── mly_map_feature_traffic_sign-14-2745-6520.json
-    ├── mly_map_feature_traffic_sign-14-2745-6521.json
-    ├── mly_map_feature_traffic_sign-14-2745-6522.json
-    ├── mly_map_feature_traffic_sign-14-2745-6523.json
-    ├── mly_map_feature_traffic_sign-14-2745-6524.json
-    ├── mly_map_feature_traffic_sign-14-2746-6520.json
-    ├── mly_map_feature_traffic_sign-14-2746-6521.json
-    ├── mly_map_feature_traffic_sign-14-2746-6522.json
-    ├── mly_map_feature_traffic_sign-14-2746-6523.json
-    ├── mly_map_feature_traffic_sign-14-2746-6524.json
-    ├── mly_map_feature_traffic_sign-14-2747-6520.json
-    ├── mly_map_feature_traffic_sign-14-2747-6521.json
-    ├── mly_map_feature_traffic_sign-14-2747-6522.json
-    ├── mly_map_feature_traffic_sign-14-2747-6523.json
-    ├── mly_map_feature_traffic_sign-14-2747-6524.json
-    ├── mly_map_feature_traffic_sign-14-2748-6520.json
-    ├── mly_map_feature_traffic_sign-14-2748-6521.json
-    ├── mly_map_feature_traffic_sign-14-2748-6522.json
-    ├── mly_map_feature_traffic_sign-14-2748-6523.json
-    └── mly_map_feature_traffic_sign-14-2748-6524.json
-```
+**Fetching a range of tiles:** `vtdecode-mapillary --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
 
 Note that the Mapillary URL must resemble `https://tiles.mapillary.com/maps/vtp/<feature-type>/2/<zoom-level>/{x}/{y}******`. The program will try to parse the string and find object type and tile coordinates. Zoom level should be fixed and directly encoded in the URL.
 
+**Fetching a single tile:** `vtdecode-mapillary --url https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/2745/6520?access_token=<YOUR_API_KEY> --output-file traffic-signs-14-2745-6520.json`.
+
+Here the URL is treated as fixed.
+
 ## Output Format
-Each layer in the input file will be converted into one `FeatureCollection`, therefore one GeoJSON object. Therefore, the output file will NOT be a pure GeoJSON file (unless you specified the `--layer` option). Instead, it will contain multiple GeoJSON objects indexed by their layer names.
+A Vertex Tile file may contain multiple layers, each layer containing a `FeatureCollection` GeoJSON object. However, there can only be one `FeatureCollection` in each GeoJSON file.
+
+Therefore, when none of `--layer` or `--split-layers` is provided, all generated GeoJSON objects will be put into a single JSON file. The generated JSON object will contain keys that correspond to layer names, and values as the GeoJSON object.
 
 For example, parsing a terrain file from mapbox generates a JSON file like this:
 ```
@@ -109,4 +99,4 @@ For example, parsing a terrain file from mapbox generates a JSON file like this:
 }
 ```
 
-This behavior can be avoided if you use the `--layer` switch. For example, if you used `--layer landcover`, the output JSON file will be a pure GeoJSON that contains only the `landcover` layer.
+This behavior can be avoided if you use the `--layer` or `--split-layers` switch. For example, if you used `--layer landcover`, the output JSON file will be a pure GeoJSON that contains only the `landcover` layer.

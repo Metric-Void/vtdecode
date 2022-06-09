@@ -7,8 +7,8 @@ import re
 from aiohttp_retry import RetryClient, ExponentialRetry
 import geojson
 
-pattern = re.compile("https://tiles.mapillary.com/maps/vtp/([^/]*)/2/(\\d+)/{x}/{y}.*")
-fixed_pattern = re.compile("https://tiles.mapillary.com/maps/vtp/([^/]*)/2/(\\d+)/(\\d+)/(\\d+).*")
+pattern = re.compile("https://api.mapbox.com/v4/([^/]*)/(\\d+)/{x}/{y}.*")
+fixed_pattern = re.compile("https://api.mapbox.com/v4/([^/]*)/(\\d+)/(\\d+)/(\\d+).*")
 
 async def worker(url, client, output_dir, tile_name, json_indent, xtile, ytile, zoom, split_layers):
     print(f"Fetching tile {zoom}-{xtile}-{ytile}")
@@ -38,7 +38,7 @@ async def run(url: str, start_x: int, start_y: int, end_x: int, end_y: int, outp
 
     match = re.match(pattern, url)
     if(match is None):
-        print("URL does not match Mapillary tile request pattern.")
+        print("URL does not match Mapbox Vector Tiles API request pattern.")
         return
     
     tile_name = match[1]
@@ -53,7 +53,7 @@ async def run(url: str, start_x: int, start_y: int, end_x: int, end_y: int, outp
 async def run_fixed(url: str, output_dir: str, output_filename: str, json_indent, split_layers):
     match = re.match(fixed_pattern, url)
     if(match is None):
-        print("URL does not match Mapillary tile request pattern.")
+        print("URL does not match Mapbox Vector Tiles API request pattern.")
         return
     
     tile_name = match[1]
@@ -94,7 +94,7 @@ async def run_fixed(url: str, output_dir: str, output_filename: str, json_indent
                 asyncio.sleep(10)
 
 def main():
-    parser = argparse.ArgumentParser(description="Fetch multiple tiles from mapillary.com and convert to GeoJSON.")
+    parser = argparse.ArgumentParser(description="Fetch multiple tiles from mapbox.com and convert to GeoJSON.")
     parser.add_argument("--url", dest = "url", help="URL template of tiles to fetch. {x} and {y} in the template will be replaced.", required=True)
     parser.add_argument("--start-x", dest = "start_x", help="X coordinate of first tile", required=False, type=int)
     parser.add_argument("--start-y", dest = "start_y", help="Y coordinate of first tile", required=False, type=int)
