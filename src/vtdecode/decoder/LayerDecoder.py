@@ -1,10 +1,10 @@
 from time import sleep
 from pyparsing import line
-import decode.vector_tile_pb2 as vt_proto
+from . import vector_tile_pb2 as vt_proto
 from geojson import Feature, Point, FeatureCollection, LineString, MultiLineString, MultiPolygon, Polygon, MultiPoint
 from typing import Dict, Tuple, List
 import math
-from decode.utils import unzigzag_coords, expand_commands, area_by_shoelace
+from .utils import unzigzag_coords, expand_commands, area_by_shoelace
 import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 

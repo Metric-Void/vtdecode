@@ -1,12 +1,9 @@
 import argparse
-from base64 import decode
-from decode.FileDecoder import FileDecoder
-import decode.vector_tile_pb2 as vt_proto
-from decode.decode import decode_file
+from .decoder.FileDecoder import FileDecoder
 import geojson
 import json
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description="Convert Vector Tile Protobuf files to GeoJSON.")
     parser.add_argument("-i", "--input", required=True, dest='input_file', help="Input file")
     parser.add_argument("-o", "--output", required=True, dest='output_file',help="Output file")
@@ -33,3 +30,6 @@ if __name__ == '__main__':
                 geojson.dump(decoded[args.layer], open(args.output_file, 'w'), indent=args.json_indent if args.json_indent > 0 else None)
             else:
                 print("Layer %s not found in input file." % (args.layer))
+
+if __name__ == '__main__':
+    main()

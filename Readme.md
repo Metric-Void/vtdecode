@@ -4,7 +4,7 @@ This project centers around decoding Vector Tile formats (protobuf) files and co
 
 ## Entrypoints
 
-### main.py
+### src.vtdecode.main
 Decodes a Vertex-Tile Protobuf on the computer, and saves it to a JSON file containing GeoJSON.
 
 ```
@@ -26,7 +26,7 @@ optional arguments:
   --layer LAYER         Only decode layer with given name. Outputs Pure GeoJSON.
 ```
 
-Example usage: `python main.py --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
+Example usage: `python -m src.vtdecode.main --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
 
 ### mapillary.py
 Fetch a bunch of data from Mapillary, convert them to GeoJSON, and put them into a folder.
@@ -49,7 +49,7 @@ optional arguments:
                         Output directory
 ```
 
-Example usage: `python .\mapillary.py --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
+Example usage: `python src.vtdecode.mapillary --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
 
 The command above will generate file and folder structure as follows, where each `json` file is a dictionary of GeoJSON files as shown in the [Output Format] section below.
 ```

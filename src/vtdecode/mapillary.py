@@ -1,15 +1,10 @@
 import argparse
 import asyncio
-from base64 import decode
-from decode.BytesDecoder import BytesDecoder
-import decode.vector_tile_pb2 as vt_proto
-from decode.decode import decode_file
-import geojson
+from .decoder.BytesDecoder import BytesDecoder
 import json
-import aiohttp
 import os
 import re
-from aiohttp_retry import RandomRetry, RetryClient, ExponentialRetry
+from aiohttp_retry import RetryClient, ExponentialRetry
 
 pattern = re.compile("https://tiles.mapillary.com/maps/vtp/([^/]*)/2/(\\d+)/{x}/{y}.*")
 
@@ -45,7 +40,7 @@ async def run(url: str, start_x: int, start_y: int, end_x: int, end_y: int, outp
                 output_filename = os.path.join(output_dir, f"{tile_name}-{zoom}-{x}-{y}.json")
                 await worker(tile_url, client, output_filename, json_indent, x, y, zoom)
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description="Fetch tiles from mapillary.com and convert to GeoJSON.")
     parser.add_argument("--url", dest = "url", help="URL template of tiles to fetch. {x} and {y} in the template will be replaced.", required=True)
     parser.add_argument("--start-x", dest = "start_x", help="X coordinate of first tile", required=True, type=int)
@@ -67,3 +62,6 @@ if __name__ == '__main__':
     else:
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(run(args.url, args.start_x, args.start_y, args.end_x, args.end_y, args.output_dir, args.json_indent))
+
+if __name__ == '__main__':
+    main()

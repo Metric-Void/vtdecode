@@ -1,5 +1,5 @@
 from pyparsing import line
-import decode.vector_tile_pb2 as vt_proto
+from . import vector_tile_pb2 as vt_proto
 from geojson import Feature, Point, FeatureCollection, LineString, MultiLineString, MultiPolygon, Polygon, MultiPoint
 from typing import Dict, Tuple, List
 import math

@@ -2,3 +2,5 @@ notebook/
 .idea/
 .vscode/
 **/__pycache__/
+dist/
+src/vtdecode.egg-info/

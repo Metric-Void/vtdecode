@@ -1,24 +1,23 @@
+from pickletools import bytes_types
 from pyparsing import line
-from decode.LayerDecoder import LayerDecoder
-import decode.vector_tile_pb2 as vt_proto
+from .LayerDecoder import LayerDecoder
+from . import vector_tile_pb2 as vt_proto
 from geojson import Feature, Point, FeatureCollection, LineString, MultiLineString, MultiPolygon, Polygon, MultiPoint
 from typing import Dict, Tuple, List
-from decode.LayerDecoder import LayerDecoder
 import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 
-class FileDecoder:
-    def __init__(self, xtile: int, ytile: int, zoom: int, filename: str):
+class BytesDecoder:
+    def __init__(self, xtile: int, ytile: int, zoom: int, bytes: bytes):
         "Load the file decoder with a file. Decoding has not started."
         self.xtile = xtile
         self.ytile = ytile
         self.zoom = zoom
-        self.filename = filename
+        self.bytes = bytes
         self.decoded = None
     
     def read_protobuf(self) -> vt_proto.Tile:
-        with open(self.filename, 'rb') as f:
-            return vt_proto.Tile.FromString(f.read())
+        return vt_proto.Tile.FromString(self.bytes)
     
     def decode_layer(self, layer: vt_proto.Tile.Layer) -> Tuple[str, FeatureCollection]:
         layer_decoder = LayerDecoder(self, layer)
