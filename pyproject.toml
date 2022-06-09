@@ -6,9 +6,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vtdecode"
-version = "1.0.0"
+version = "1.0.1"
 description = "Fetch and decode vector tiles"
-readme = "Readme.md"
+readme = "README.md"
 authors = [{ name = "Metric-Void", email = "metricvoidlx@gmail.com"}]
 license = { text = "MIT", url = "https://opensource.org/licenses/MIT" }
 classifiers = [
@@ -16,6 +16,7 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
+keywords = ["vector tile", "mapbox", "mapillary"]
 dependencies = [
     "protobuf==4.21.1",
     "geojson==2.5.0",
@@ -24,9 +25,23 @@ dependencies = [
 ]
 requires-python = ">=3.8"
 
-[project.urls]
-Homepage = "https://github.com/Metric-Void/vtdecode"
+    [project.urls]
+    Homepage = "https://github.com/Metric-Void/vtdecode"
 
-[project.scripts]
-vtdecode = "vtdecode.main:main"
-vtdecode-mapillary = "vtdecode.mapillary:main"
+    [project.scripts]
+    vtdecode = "vtdecode.main:main"
+    vtdecode-mapillary = "vtdecode.mapillary:main"
+
+[tool.bumpver]
+current_version = "1.0.1"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = true
+
+    [tool.bumpver.file_patterns]
+    "pyproject.toml" = [
+        'current_version = "{version}"',
+        'version = "{version}"'
+    ]

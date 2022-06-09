@@ -4,8 +4,8 @@ This project centers around decoding Vector Tile formats (protobuf) files and co
 
 ## Entrypoints
 
-### src.vtdecode.main
-Decodes a Vertex-Tile Protobuf on the computer, and saves it to a JSON file containing GeoJSON.
+### vtdecode.main
+Decodes a Vertex-Tile Protobuf on the local machine, and saves it to a JSON file containing GeoJSON.
 
 ```
 usage: main.py [-h] -i INPUT_FILE -o OUTPUT_FILE [-x TILE_X] [-y TILE_Y] [-z TILE_Z] [--json-indent JSON_INDENT] [--layer LAYER]
@@ -26,19 +26,19 @@ optional arguments:
   --layer LAYER         Only decode layer with given name. Outputs Pure GeoJSON.
 ```
 
-Example usage: `python -m src.vtdecode.main --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
+Example usage: `~/src/$ python -m vtdecode.main --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
 
-### mapillary.py
+### vtdecode.mapillary
 Fetch a bunch of data from Mapillary, convert them to GeoJSON, and put them into a folder.
 
 ```
 usage: mapillary.py [-h] --url URL --start-x START_X --start-y START_Y --end-x END_X --end-y END_Y [--json-indent JSON_INDENT] --output-dir OUTPUT_DIR
 
-Fetch tiles from mapillary.com and convert to GeoJSON.
+Fetch multiple tiles from mapillary.com and convert to GeoJSON.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --url URL             URL template of tiles to fetch
+  --url URL             URL template of tiles to fetch. {x} and {y} in the template will be replaced.
   --start-x START_X     X coordinate of first tile
   --start-y START_Y     Y coordinate of first tile
   --end-x END_X         X coordinate of last tile (inclusive)
@@ -49,7 +49,7 @@ optional arguments:
                         Output directory
 ```
 
-Example usage: `python src.vtdecode.mapillary --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
+Example usage: `~/src/$ python vtdecode.mapillary --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
 
 The command above will generate file and folder structure as follows, where each `json` file is a dictionary of GeoJSON files as shown in the [Output Format] section below.
 ```
@@ -81,7 +81,7 @@ The command above will generate file and folder structure as follows, where each
     └── mly_map_feature_traffic_sign-14-2748-6524.json
 ```
 
-Note that the Mapillary URL must resemble `https://tiles.mapillary.com/maps/vtp/****/2/**/{x}/{y}******`. The program will try to parse the string and find object type and tile coordinates.
+Note that the Mapillary URL must resemble `https://tiles.mapillary.com/maps/vtp/<feature-type>/2/<zoom-level>/{x}/{y}******`. The program will try to parse the string and find object type and tile coordinates. Zoom level should be fixed and directly encoded in the URL.
 
 ## Output Format
 Each layer in the input file will be converted into one `FeatureCollection`, therefore one GeoJSON object. Therefore, the output file will NOT be a pure GeoJSON file (unless you specified the `--layer` option). Instead, it will contain multiple GeoJSON objects indexed by their layer names.

@@ -41,7 +41,7 @@ async def run(url: str, start_x: int, start_y: int, end_x: int, end_y: int, outp
                 await worker(tile_url, client, output_filename, json_indent, x, y, zoom)
 
 def main():
-    parser = argparse.ArgumentParser(description="Fetch tiles from mapillary.com and convert to GeoJSON.")
+    parser = argparse.ArgumentParser(description="Fetch multiple tiles from mapillary.com and convert to GeoJSON.")
     parser.add_argument("--url", dest = "url", help="URL template of tiles to fetch. {x} and {y} in the template will be replaced.", required=True)
     parser.add_argument("--start-x", dest = "start_x", help="X coordinate of first tile", required=True, type=int)
     parser.add_argument("--start-y", dest = "start_y", help="Y coordinate of first tile", required=True, type=int)
