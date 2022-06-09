@@ -1,0 +1,2 @@
+protobuf==4.21.1
+geojson==2.5.0

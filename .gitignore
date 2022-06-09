@@ -1,0 +1,4 @@
+notebook/
+.idea/
+.vscode/
+**/__pycache__/
