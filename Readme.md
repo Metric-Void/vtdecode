@@ -2,9 +2,15 @@
 
 This project centers around decoding Vector Tile formats (protobuf) files and converting them to JSON. It uses the same backend for decoding Vertex Tile files, and provides multiple entrypoints for fetching those files.
 
+## Installation
+This package is available on PyPI.
+```
+pip install vtdecode
+```
+
 ## Entrypoints
 
-### vtdecode.main
+### vtdecode
 Decodes a Vertex-Tile Protobuf on the local machine, and saves it to a JSON file containing GeoJSON.
 
 ```
@@ -26,13 +32,20 @@ optional arguments:
   --layer LAYER         Only decode layer with given name. Outputs Pure GeoJSON.
 ```
 
-Example usage: `~/src/$ python -m vtdecode.main --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
+X, Y, and Zoom levels represent the tile coordinates as specified in https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames.
+This information is necessary to calculate the actual latitude and longitude of point coordinates.
 
-### vtdecode.mapillary
+When not using the --layer or --split-layer options, the output file will contain multiple GeoJSON features, denoted by their keys.
+When using the --layer LAYER_NAME option, only a single layer will be exported, and the output will be a single GeoJSON FeatureCollection.
+When using the --split-layer option, multiple files will be generated (suffixed with the layer name), each containing a single layer in GeoJSON FeatureCollection.
+
+Example usage: `vtdecode --input sample_14_8185_5449.pbf -x 8185 -y 5449 -z 14 --output-file sample_14_8185_5449.json`.
+
+### vtdecode-mapillary
 Fetch a bunch of data from Mapillary, convert them to GeoJSON, and put them into a folder.
 
 ```
-usage: mapillary.py [-h] --url URL --start-x START_X --start-y START_Y --end-x END_X --end-y END_Y [--json-indent JSON_INDENT] --output-dir OUTPUT_DIR
+usage: mapillary.py [-h] --url URL --start-x START_X --start-y START_Y --end-x END_X --end-y END_Y [--json-indent JSON_INDENT] --output-dir OUTPUT_DIR [--split-layers]
 
 Fetch multiple tiles from mapillary.com and convert to GeoJSON.
 
@@ -47,9 +60,10 @@ optional arguments:
                         JSON file indentation. 0 or negative numbers generate dense JSON file.
   --output-dir OUTPUT_DIR
                         Output directory
+  --split-layers        Split layers into separate GeoJSON files. Outputs Pure GeoJSON.
 ```
 
-Example usage: `~/src/$ python vtdecode.mapillary --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
+Example usage: `vtdecode-mapillary --url "https://tiles.mapillary.com/maps/vtp/mly_map_feature_traffic_sign/2/14/{x}/{y}?access_token=<YOUR_API_KEY>" --start-x 2744 --end-x 2748 --start-y 6520 --end-y 6524 --output-dir "./traffic-signs" --json-indent 4`
 
 The command above will generate file and folder structure as follows, where each `json` file is a dictionary of GeoJSON files as shown in the [Output Format] section below.
 ```

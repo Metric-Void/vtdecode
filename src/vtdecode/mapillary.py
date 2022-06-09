@@ -5,11 +5,12 @@ import json
 import os
 import re
 from aiohttp_retry import RetryClient, ExponentialRetry
+import geojson
 
 pattern = re.compile("https://tiles.mapillary.com/maps/vtp/([^/]*)/2/(\\d+)/{x}/{y}.*")
 
-async def worker(url, client, output_file, json_indent, xtile, ytile, zoom):
-    print("Fetching %s" % (url))
+async def worker(url, client, output_dir, tile_name, json_indent, xtile, ytile, zoom, split_layers):
+    print(f"Fetching tile {zoom}-{xtile}-{ytile}")
     async with client.get(url) as response:
         if(response.status == 429):
             asyncio.sleep(5)
@@ -17,13 +18,21 @@ async def worker(url, client, output_file, json_indent, xtile, ytile, zoom):
             body = await response.read()
             decoder = BytesDecoder(xtile, ytile, zoom, body)
             result = decoder.decode()
-            with open(output_file, 'w') as f:
-                json.dump(result, f, indent=json_indent if json_indent > 0 else None)
-            print(f"Written to {output_file}")
+            if(split_layers):
+                for layer_name, layer_content in result.items():
+                    output_filename = os.path.join(output_dir, f"{tile_name}-{zoom}-{xtile}-{ytile}-{layer_name}.json")
+                    print("Writing layer {} to {}".format(layer_name, output_filename))
+                    with open(output_filename, 'w') as f:
+                        geojson.dump(layer_content, f, indent=json_indent if json_indent > 0 else None)
+            else:
+                output_filename = os.path.join(output_dir, f"{tile_name}-{zoom}-{xtile}-{ytile}.json")
+                with open(output_filename, 'w') as f:
+                    json.dump(result, f, indent=json_indent if json_indent > 0 else None)
+                print(f"Writing all layers to {output_filename}")
         elif(response.status // 100 == 5):
             asyncio.sleep(10)
 
-async def run(url: str, start_x: int, start_y: int, end_x: int, end_y: int, output_dir, json_indent):
+async def run(url: str, start_x: int, start_y: int, end_x: int, end_y: int, output_dir, json_indent, split_layers):
     os.makedirs(output_dir, exist_ok=True)
 
     match = re.match(pattern, url)
@@ -38,7 +47,7 @@ async def run(url: str, start_x: int, start_y: int, end_x: int, end_y: int, outp
             for y in range(start_y, end_y + 1):
                 tile_url = url.replace('{x}', str(x)).replace('{y}', str(y))
                 output_filename = os.path.join(output_dir, f"{tile_name}-{zoom}-{x}-{y}.json")
-                await worker(tile_url, client, output_filename, json_indent, x, y, zoom)
+                await worker(tile_url, client, output_dir, tile_name, json_indent, x, y, zoom, split_layers)
 
 def main():
     parser = argparse.ArgumentParser(description="Fetch multiple tiles from mapillary.com and convert to GeoJSON.")
@@ -50,6 +59,7 @@ def main():
 
     parser.add_argument("--json-indent", dest="json_indent", help="JSON file indentation. 0 or negative numbers generate dense JSON file.", default=0, type=int, required = False)
     parser.add_argument("--output-dir", dest = "output_dir", help="Output directory", required=True)
+    parser.add_argument("--split-layers", dest = "split_layers", help="Split layers into separate GeoJSON files. Outputs Pure GeoJSON.", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -61,7 +71,7 @@ def main():
         exit(1)
     else:
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-        asyncio.run(run(args.url, args.start_x, args.start_y, args.end_x, args.end_y, args.output_dir, args.json_indent))
+        asyncio.run(run(args.url, args.start_x, args.start_y, args.end_x, args.end_y, args.output_dir, args.json_indent, args.split_layers))
 
 if __name__ == '__main__':
     main()
