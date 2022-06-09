@@ -3,6 +3,7 @@ import asyncio
 from .decoder.BytesDecoder import BytesDecoder
 import json
 import os
+import sys
 import re
 from aiohttp_retry import RetryClient, ExponentialRetry
 import geojson
@@ -108,7 +109,11 @@ def main():
 
     args = parser.parse_args()
 
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    if("win" in sys.platform.lower()):
+        try:
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        except:
+            pass
 
     if(args.output_dir is None and args.output is None):
         print("Must specify either --output or --output-dir")
