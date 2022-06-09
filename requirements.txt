@@ -1,2 +1,4 @@
 protobuf==4.21.1
 geojson==2.5.0
+aiohttp==3.8.1
+aiohttp-retry==2.4.6

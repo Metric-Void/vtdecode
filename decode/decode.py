@@ -1,5 +1,3 @@
-from sunau import Au_read
-
 from pyparsing import line
 import decode.vector_tile_pb2 as vt_proto
 from geojson import Feature, Point, FeatureCollection, LineString, MultiLineString, MultiPolygon, Polygon, MultiPoint
@@ -157,8 +155,6 @@ def parse_linestring(feature: vt_proto.Tile.Feature, keys, values, xtile, ytile,
             coordinates=acquired_lines[0],
             properties=properties
         )
-
-    pass
 
 def parse_polygon(feature: vt_proto.Tile.Feature, keys, values, xtile, ytile, zoom, extent):
     geometry_cmds = feature.geometry

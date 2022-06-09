@@ -1,5 +1,6 @@
 import argparse
 from base64 import decode
+from decode.FileDecoder import FileDecoder
 import decode.vector_tile_pb2 as vt_proto
 from decode.decode import decode_file
 import geojson
@@ -23,7 +24,8 @@ if __name__ == '__main__':
     elif(args.output_file is None):
         print("No output file specified.")
     else:
-        decoded = decode_file(args.input_file, args.tile_x, args.tile_y, args.tile_z)
+        decoder = FileDecoder(args.tile_x, args.tile_y, args.tile_z, args.input_file)
+        decoded = decoder.decode()
         if(args.layer is None):
             json.dump(decoded, open(args.output_file, 'w'), indent=args.json_indent if args.json_indent > 0 else None)
         else:
