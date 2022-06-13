@@ -109,7 +109,7 @@ def main():
 
     args = parser.parse_args()
 
-    if("win" in sys.platform.lower()):
+    if(sys.platform.lower().startswith("win")):
         try:
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         except:
