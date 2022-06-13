@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vtdecode"
-version = "1.2.4"
+version = "1.2.5"
 description = "Fetch and decode vector tiles"
 readme = "README.md"
 authors = [{ name = "Metric-Void", email = "metricvoidlx@gmail.com"}]
@@ -35,7 +35,7 @@ requires-python = ">=3.8"
     vtdecode-mapbox = "vtdecode.mapbox:main"
 
 [tool.bumpver]
-current_version = "1.2.4"
+current_version = "1.2.5"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
